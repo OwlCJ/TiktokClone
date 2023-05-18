@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tiktok_clone/constants/gaps.dart';
 import 'package:tiktok_clone/constants/sizes.dart';
+import 'package:tiktok_clone/features/authentication/email_screen.dart';
+import 'package:tiktok_clone/features/authentication/widgets/form_button.dart';
 
 class UsernameScreen extends StatefulWidget {
   const UsernameScreen({super.key});
@@ -26,12 +28,25 @@ class _UsernameScreenState extends State<UsernameScreen> {
   }
 
   @override
+  void dispose() {
+    _usernameController.dispose();
+    super.dispose();
+  }
+
+  void _onNextTap(BuildContext context) {
+    if (_username.isEmpty) return;
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => const EmailScreen(),
+    ));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         title: const Text(
-          "Sign up",
+          'Sign up',
         ),
       ),
       body: Padding(
@@ -41,7 +56,7 @@ class _UsernameScreenState extends State<UsernameScreen> {
           children: [
             Gaps.v40,
             const Text(
-              "Create username",
+              'Create username',
               style: TextStyle(
                 fontSize: Sizes.size20,
                 fontWeight: FontWeight.w600,
@@ -49,7 +64,7 @@ class _UsernameScreenState extends State<UsernameScreen> {
             ),
             Gaps.v8,
             const Text(
-              "You can always change this later.",
+              'You can always change this later.',
               style: TextStyle(
                 fontSize: Sizes.size16,
                 color: Colors.black54,
@@ -59,7 +74,7 @@ class _UsernameScreenState extends State<UsernameScreen> {
             TextField(
               controller: _usernameController,
               decoration: InputDecoration(
-                hintText: "Username",
+                hintText: 'Username',
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
                     color: Colors.grey.shade400,
@@ -74,28 +89,9 @@ class _UsernameScreenState extends State<UsernameScreen> {
               cursorColor: Theme.of(context).primaryColor,
             ),
             Gaps.v28,
-            FractionallySizedBox(
-              widthFactor: 1,
-              child: AnimatedContainer(
-                padding: const EdgeInsets.symmetric(
-                  vertical: Sizes.size12,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(Sizes.size5),
-                  color: _username.isEmpty
-                      ? Colors.grey.shade300
-                      : Theme.of(context).primaryColor,
-                ),
-                duration: const Duration(milliseconds: 300),
-                child: const Text(
-                  'Next',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+            FormButton(
+              onTapGesture: _onNextTap,
+              isEmpty: _username.isEmpty,
             )
           ],
         ),
