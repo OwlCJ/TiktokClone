@@ -6,19 +6,19 @@ class AuthButton extends StatelessWidget {
   final String text;
   final FaIcon icon;
 
-  final void Function(BuildContext)? onTapFunction;
+  final void Function(BuildContext)? onTapGesture;
 
   const AuthButton({
     super.key,
     required this.text,
     required this.icon,
-    this.onTapFunction,
+    this.onTapGesture,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTapFunction != null ? () => onTapFunction!(context) : null,
+      onTap: onTapGesture != null ? () => onTapGesture!(context) : null,
       child: FractionallySizedBox(
         widthFactor: 1,
         child: Container(
