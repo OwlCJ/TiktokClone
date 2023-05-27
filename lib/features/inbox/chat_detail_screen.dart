@@ -88,6 +88,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           GestureDetector(
             onTap: _onTextFieldUnFocus,
             child: ListView.separated(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: const EdgeInsets.symmetric(
                 vertical: Sizes.size20,
                 horizontal: Sizes.size14,
