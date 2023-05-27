@@ -66,61 +66,57 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           elevation: 1,
-          title: TextField(
-            onChanged: _onSearchChanged,
-            controller: _textEditingController,
-            textAlignVertical: TextAlignVertical.bottom,
-            decoration: InputDecoration(
-              hintText: "Search",
-              hintStyle: TextStyle(
-                fontSize: Sizes.size16,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey.shade500,
-              ),
-              fillColor: Colors.grey.shade200,
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: Sizes.size16),
-              filled: true,
-              prefixIcon: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: Sizes.size12),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    FaIcon(
-                      FontAwesomeIcons.magnifyingGlass,
-                      size: Sizes.size20,
-                      color: Colors.grey.shade500,
-                    ),
-                  ],
+          title: Container(
+            clipBehavior: Clip.hardEdge,
+            decoration:
+                BoxDecoration(borderRadius: BorderRadius.circular(Sizes.size7)),
+            child: TextField(
+              onChanged: _onSearchChanged,
+              controller: _textEditingController,
+              textAlignVertical: TextAlignVertical.center,
+              decoration: InputDecoration(
+                hintText: "Search",
+                hintStyle: TextStyle(
+                  fontSize: Sizes.size16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey.shade500,
                 ),
-              ),
-              suffixIcon: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: Sizes.size16),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (_isSearching)
-                      GestureDetector(
-                        onTap: _onSearchClearTap,
-                        child: FaIcon(
-                          FontAwesomeIcons.solidCircleXmark,
-                          size: Sizes.size20,
-                          color: Colors.grey.shade500,
-                        ),
+                fillColor: Colors.grey.shade200,
+                filled: true,
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: Sizes.size12),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      FaIcon(
+                        FontAwesomeIcons.magnifyingGlass,
+                        size: Sizes.size20,
+                        color: Colors.grey.shade500,
                       ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              border: const OutlineInputBorder(
-                borderSide: BorderSide.none,
+                suffixIcon: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: Sizes.size16),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_isSearching)
+                        GestureDetector(
+                          onTap: _onSearchClearTap,
+                          child: FaIcon(
+                            FontAwesomeIcons.solidCircleXmark,
+                            size: Sizes.size20,
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                border: InputBorder.none,
               ),
             ),
           ),
-
-          // CupertinoSearchTextField(
-          //   onChanged: _onSearchChanged,
-          //   onSubmitted: _onSearchSubmitted,
-          // ),
           bottom: TabBar(
             onTap: _onTabBarUnFocus,
             splashFactory: NoSplash.splashFactory,
