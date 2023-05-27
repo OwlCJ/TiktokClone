@@ -75,6 +75,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
         title: const Text('Direct messages'),
         actions: [
           IconButton(
+            enableFeedback: false,
             onPressed: _addItem,
             icon: const FaIcon(
               FontAwesomeIcons.plus,
