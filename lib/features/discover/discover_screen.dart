@@ -24,7 +24,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   late TextEditingController _textEditingController;
   late bool _isSearching = false;
 
-  void _onSearchSubmitted(String value) {}
+  // void _onSearchSubmitted(String value) {}
 
   void _onSearchChanged(String value) {}
 
