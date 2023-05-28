@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tiktok_clone/constants/gaps.dart';
 import 'package:tiktok_clone/constants/sizes.dart';
+import 'package:tiktok_clone/features/settings/settings_screen.dart';
 import 'package:tiktok_clone/features/users/widgets/persistent_tab_bar.dart';
 import 'package:tiktok_clone/features/users/widgets/user_profile_infobox.dart';
 
@@ -13,6 +14,12 @@ class UserprofileScreen extends StatefulWidget {
 }
 
 class _UserprofileScreenState extends State<UserprofileScreen> {
+  void _onGearPressed() {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => const SettingsScreen(),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -25,7 +32,7 @@ class _UserprofileScreenState extends State<UserprofileScreen> {
                 title: const Text('Testing Users'),
                 actions: [
                   IconButton(
-                      onPressed: () {},
+                      onPressed: _onGearPressed,
                       icon: const FaIcon(FontAwesomeIcons.gear))
                 ],
               ),

@@ -69,7 +69,8 @@ class _VideoPostState extends State<VideoPost>
   }
 
   void _onVisibilityChanged(VisibilityInfo info) {
-    // 위젯트리에 init이 완료되었는지 확인하고 실행 dispose가 됬을 때 videoPlayerController에 참조해 에러발생
+    // 위젯트리에 init이 완료되었는지 확인하고 실행
+    // dispose가 됬을 때 videoPlayerController에 참조해 에러발생
     if (!mounted) return;
     if (info.visibleFraction == 1 &&
         !_isPaused &&
