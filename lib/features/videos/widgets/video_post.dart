@@ -109,6 +109,7 @@ class _VideoPostState extends State<VideoPost>
       _onToggleVideo();
     }
     await showModalBottomSheet(
+      constraints: const BoxConstraints(maxWidth: 700),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       context: context,
