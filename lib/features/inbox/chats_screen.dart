@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:tiktok_clone/constants/breakpoints.dart';
 import 'package:tiktok_clone/constants/sizes.dart';
 import 'package:tiktok_clone/features/inbox/chat_detail_screen.dart';
 
@@ -37,7 +38,10 @@ class _ChatsScreenState extends State<ChatsScreen> {
   void _onChatTap() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const ChatDetailScreen(),
+        builder: (context) => ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: Breakpoints.lg),
+          child: const ChatDetailScreen(),
+        ),
       ),
     );
   }
@@ -69,35 +73,39 @@ class _ChatsScreenState extends State<ChatsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 1,
-        title: const Text('Direct messages'),
-        actions: [
-          IconButton(
-            enableFeedback: false,
-            onPressed: _addItem,
-            icon: const FaIcon(
-              FontAwesomeIcons.plus,
-            ),
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: Breakpoints.lg),
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Direct messages'),
+            actions: [
+              IconButton(
+                enableFeedback: false,
+                onPressed: _addItem,
+                icon: const FaIcon(
+                  FontAwesomeIcons.plus,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: AnimatedList(
-        key: _key,
-        padding: const EdgeInsets.symmetric(
-          vertical: Sizes.size10,
-        ),
-        itemBuilder: (context, index, animation) {
-          return FadeTransition(
-            key: UniqueKey(),
-            opacity: animation,
-            child: SizeTransition(
-              sizeFactor: animation,
-              child: _makeTile(index),
+          body: AnimatedList(
+            key: _key,
+            padding: const EdgeInsets.symmetric(
+              vertical: Sizes.size10,
             ),
-          );
-        },
+            itemBuilder: (context, index, animation) {
+              return FadeTransition(
+                key: UniqueKey(),
+                opacity: animation,
+                child: SizeTransition(
+                  sizeFactor: animation,
+                  child: _makeTile(index),
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }
