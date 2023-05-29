@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:tiktok_clone/constants/breakpoints.dart';
 import 'package:tiktok_clone/constants/gaps.dart';
 import 'package:tiktok_clone/constants/sizes.dart';
 import 'package:tiktok_clone/features/videos/widgets/video_comments.dart';
@@ -44,6 +46,9 @@ class _VideoPostState extends State<VideoPost>
         VideoPlayerController.asset("assets/videos/video.mov");
     await _videoPlayerController.initialize();
     await _videoPlayerController.setLooping(true);
+    if (kIsWeb) {
+      _videoPlayerController.setVolume(0);
+    }
     _videoPlayerController.addListener(_onVideoChange);
     setState(() {});
   }
@@ -69,10 +74,16 @@ class _VideoPostState extends State<VideoPost>
   }
 
   void _onVisibilityChanged(VisibilityInfo info) {
+    // 위젯트리에 init이 완료되었는지 확인하고 실행
+    // dispose가 됬을 때 videoPlayerController에 참조해 에러발생
+    if (!mounted) return;
     if (info.visibleFraction == 1 &&
         !_isPaused &&
         !_videoPlayerController.value.isPlaying) {
       _videoPlayerController.play();
+    }
+    if (_videoPlayerController.value.isPlaying && info.visibleFraction == 0) {
+      _onToggleVideo();
     }
   }
 
@@ -99,12 +110,22 @@ class _VideoPostState extends State<VideoPost>
       _onToggleVideo();
     }
     await showModalBottomSheet(
+      constraints: const BoxConstraints(maxWidth: Breakpoints.md),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       context: context,
       builder: (context) => const VideoComments(),
     );
     _onToggleVideo();
+  }
+
+  void _onVideoVolumeToggle() {
+    if (_videoPlayerController.value.volume == 0) {
+      _videoPlayerController.setVolume(100);
+    } else {
+      _videoPlayerController.setVolume(0);
+    }
+    setState(() {});
   }
 
   @override
@@ -206,6 +227,15 @@ class _VideoPostState extends State<VideoPost>
                   icon: FontAwesomeIcons.share,
                   text: "2.9M",
                 ),
+                Gaps.v24,
+                GestureDetector(
+                  onTap: _onVideoVolumeToggle,
+                  child: VideoSocialButton(
+                      icon: _videoPlayerController.value.volume == 0
+                          ? FontAwesomeIcons.volumeXmark
+                          : FontAwesomeIcons.volumeHigh,
+                      text: ""),
+                )
               ],
             ),
           ),

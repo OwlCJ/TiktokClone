@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tiktok_clone/constants/breakpoints.dart';
 import 'package:tiktok_clone/features/videos/widgets/video_post.dart';
 
 class VideoTimelineScreen extends StatefulWidget {
@@ -29,10 +30,10 @@ class _VideoTimelineScreenState extends State<VideoTimelineScreen> {
 
   void _onVideoFinished() {
     return;
-    _pageController.nextPage(
-      duration: _scrollDuration,
-      curve: _scrollCurve,
-    );
+    // _pageController.nextPage(
+    //   duration: _scrollDuration,
+    //   curve: _scrollCurve,
+    // );
   }
 
   @override
@@ -53,14 +54,19 @@ class _VideoTimelineScreenState extends State<VideoTimelineScreen> {
       displacement: 50.0,
       edgeOffset: 10.0,
       onRefresh: _onRefresh,
-      child: PageView.builder(
-        controller: _pageController,
-        scrollDirection: Axis.vertical,
-        onPageChanged: onPageChanged,
-        itemCount: _itemCount,
-        itemBuilder: (context, index) => VideoPost(
-          index: index,
-          onVideoFinished: _onVideoFinished,
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: Breakpoints.lg),
+          child: PageView.builder(
+            controller: _pageController,
+            scrollDirection: Axis.vertical,
+            onPageChanged: onPageChanged,
+            itemCount: _itemCount,
+            itemBuilder: (context, index) => VideoPost(
+              index: index,
+              onVideoFinished: _onVideoFinished,
+            ),
+          ),
         ),
       ),
     );
