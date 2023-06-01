@@ -76,13 +76,11 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                 children: [
                   FaIcon(
                     FontAwesomeIcons.flag,
-                    color: Colors.black,
                     size: Sizes.size20,
                   ),
                   Gaps.h24,
                   FaIcon(
                     FontAwesomeIcons.ellipsis,
-                    color: Colors.black,
                     size: Sizes.size20,
                   ),
                 ],

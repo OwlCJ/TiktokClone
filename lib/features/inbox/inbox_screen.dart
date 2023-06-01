@@ -33,7 +33,10 @@ class InboxScreen extends StatelessWidget {
               IconButton(
                 hoverColor: Colors.transparent,
                 onPressed: () => _onDmPressed(context),
-                icon: const FaIcon(FontAwesomeIcons.paperPlane),
+                icon: const FaIcon(
+                  FontAwesomeIcons.paperPlane,
+                  size: Sizes.size20,
+                ),
               )
             ],
           ),
