@@ -120,7 +120,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
                 opacity: _showingPage == Page.first ? 0 : 1,
                 child: CupertinoButton(
                   color: Theme.of(context).primaryColor,
-                  onPressed: _onEnterAppTap,
+                  onPressed: _showingPage == Page.first ? null : _onEnterAppTap,
                   child: const Text('Enter the App!'),
                 ),
               )),
