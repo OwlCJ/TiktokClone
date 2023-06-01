@@ -94,7 +94,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 selectedIndex: _selectedIndex,
               ),
               NavTab(
-                text: 'Discorver',
+                text: 'Discover',
                 isSelected: _selectedIndex == 1,
                 icon: FontAwesomeIcons.compass,
                 selectedIcon: FontAwesomeIcons.solidCompass,
