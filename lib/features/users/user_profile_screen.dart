@@ -8,7 +8,14 @@ import 'package:tiktok_clone/features/users/widgets/persistent_tab_bar.dart';
 import 'package:tiktok_clone/features/users/widgets/user_profile_infobox.dart';
 
 class UserprofileScreen extends StatefulWidget {
-  const UserprofileScreen({super.key});
+  final String username;
+  final String tab;
+
+  const UserprofileScreen({
+    super.key,
+    required this.username,
+    required this.tab,
+  });
 
   @override
   State<UserprofileScreen> createState() => _UserprofileScreenState();
@@ -27,6 +34,7 @@ class _UserprofileScreenState extends State<UserprofileScreen> {
       backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       body: SafeArea(
         child: DefaultTabController(
+          initialIndex: widget.tab == 'likes' ? 1 : 0,
           length: 2,
           child: Center(
             child: ConstrainedBox(
@@ -35,7 +43,7 @@ class _UserprofileScreenState extends State<UserprofileScreen> {
                 headerSliverBuilder: (context, innerBoxIsScrolled) {
                   return [
                     SliverAppBar(
-                      title: const Text('Testing Users'),
+                      title: Text(widget.username),
                       actions: [
                         IconButton(
                           onPressed: _onGearPressed,
@@ -58,9 +66,9 @@ class _UserprofileScreenState extends State<UserprofileScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text(
-                                "@CJ",
-                                style: TextStyle(
+                              Text(
+                                "@${widget.username}",
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: Sizes.size18,
                                 ),

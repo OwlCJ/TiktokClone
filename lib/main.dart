@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tiktok_clone/constants/sizes.dart';
-import 'package:tiktok_clone/features/main_navigation/main_navigation_screen.dart';
+import 'package:tiktok_clone/router.dart';
 
 void main() async {
   // 모든 위젯들이 앱 시작전에 확실히 바인딩 되었는지 확인
@@ -19,7 +19,8 @@ class TikTokApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: router,
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       themeMode: ThemeMode.system,
@@ -54,19 +55,19 @@ class TikTokApp extends StatelessWidget {
         ),
       ),
       darkTheme: ThemeData(
-          brightness: Brightness.dark,
-          textTheme: Typography.whiteMountainView,
-          textSelectionTheme: const TextSelectionThemeData(
-            cursorColor: Color(0xFFE9435A),
-          ),
-          appBarTheme: AppBarTheme(backgroundColor: Colors.grey.shade900),
-          scaffoldBackgroundColor: Colors.black,
-          bottomAppBarTheme: BottomAppBarTheme(color: Colors.grey.shade900),
-          primaryColor: const Color(0xFFE9435A),
-          tabBarTheme: const TabBarTheme(
-            indicatorColor: Colors.white,
-          )),
-      home: const MainNavigationScreen(),
+        brightness: Brightness.dark,
+        textTheme: Typography.whiteMountainView,
+        textSelectionTheme: const TextSelectionThemeData(
+          cursorColor: Color(0xFFE9435A),
+        ),
+        appBarTheme: AppBarTheme(backgroundColor: Colors.grey.shade900),
+        scaffoldBackgroundColor: Colors.black,
+        bottomAppBarTheme: BottomAppBarTheme(color: Colors.grey.shade900),
+        primaryColor: const Color(0xFFE9435A),
+        tabBarTheme: const TabBarTheme(
+          indicatorColor: Colors.white,
+        ),
+      ),
     );
   }
 }
