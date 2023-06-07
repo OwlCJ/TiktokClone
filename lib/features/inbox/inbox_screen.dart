@@ -4,6 +4,7 @@ import 'package:tiktok_clone/constants/breakpoints.dart';
 import 'package:tiktok_clone/constants/sizes.dart';
 import 'package:tiktok_clone/features/inbox/activity_screen.dart';
 import 'package:tiktok_clone/features/inbox/chats_screen.dart';
+import 'package:tiktok_clone/utils.dart';
 
 class InboxScreen extends StatelessWidget {
   const InboxScreen({super.key});
@@ -22,6 +23,7 @@ class InboxScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = isDarkMode(context);
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: Breakpoints.lg),
@@ -33,7 +35,10 @@ class InboxScreen extends StatelessWidget {
               IconButton(
                 hoverColor: Colors.transparent,
                 onPressed: () => _onDmPressed(context),
-                icon: const FaIcon(FontAwesomeIcons.paperPlane),
+                icon: const FaIcon(
+                  FontAwesomeIcons.paperPlane,
+                  size: Sizes.size20,
+                ),
               )
             ],
           ),
@@ -56,7 +61,7 @@ class InboxScreen extends StatelessWidget {
               ),
               Container(
                 height: Sizes.size1,
-                color: Colors.grey.shade200,
+                color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
               ),
               ListTile(
                 leading: Container(

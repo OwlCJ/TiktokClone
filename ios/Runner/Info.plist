@@ -47,5 +47,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>We needs your camera permission for tiktok uploading</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We needs your microphone permission for tiktok uploading</string>
 </dict>
 </plist>
