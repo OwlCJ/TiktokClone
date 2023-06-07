@@ -1,5 +1,28 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:tiktok_clone/constants/gaps.dart';
+import 'package:tiktok_clone/constants/sizes.dart';
+import 'package:tiktok_clone/features/videos/widgets/flashmode_icon.dart';
+
+final List flashButtons = [
+  {
+    "flashMode": FlashMode.off,
+    "icon": Icons.flash_off_outlined,
+  },
+  {
+    "flashMode": FlashMode.always,
+    "icon": Icons.flash_on_outlined,
+  },
+  {
+    "flashMode": FlashMode.auto,
+    "icon": Icons.flash_auto_outlined,
+  },
+  {
+    "flashMode": FlashMode.torch,
+    "icon": Icons.flashlight_on_outlined,
+  },
+];
 
 class VideoRecordingScreen extends StatefulWidget {
   const VideoRecordingScreen({super.key});
@@ -10,6 +33,29 @@ class VideoRecordingScreen extends StatefulWidget {
 
 class _VideoRecordingScreenState extends State<VideoRecordingScreen> {
   bool _hasPermission = false;
+  bool _permissionDenied = false;
+
+  bool _isSelfieMode = false;
+
+  late FlashMode _flashMode;
+
+  late CameraController _cameraController;
+
+  Future<void> initCamera() async {
+    final cameras = await availableCameras();
+
+    if (cameras.isEmpty) {
+      return;
+    }
+
+    _cameraController = CameraController(
+        cameras[_isSelfieMode ? 1 : 0], ResolutionPreset.ultraHigh);
+
+    await _cameraController.initialize();
+
+    _flashMode = _cameraController.value.flashMode;
+  }
+
   Future<void> initPermissions() async {
     final cameraPermission = await Permission.camera.request();
     final micPermission = await Permission.microphone.request();
@@ -21,8 +67,11 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen> {
 
     if (!cameraDenied && !micDenied) {
       _hasPermission = true;
-      setState(() {});
+      await initCamera();
+    } else {
+      _permissionDenied = true;
     }
+    setState(() {});
   }
 
   @override
@@ -31,10 +80,100 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen> {
     initPermissions();
   }
 
+  Future<void> _toggleSelfieMode() async {
+    _isSelfieMode = !_isSelfieMode;
+    await initCamera();
+    setState(() {});
+  }
+
+  Future<void> _setFlashMode(FlashMode newFlashMode) async {
+    await _cameraController.setFlashMode(newFlashMode);
+    _flashMode = newFlashMode;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(),
+      body: Center(
+        child: _permissionDenied
+            ? const PermissionDenied()
+            : !_hasPermission || !_cameraController.value.isInitialized
+                ? const Initializing()
+                : Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      CameraPreview(_cameraController),
+                      Positioned(
+                        top: Sizes.size20,
+                        right: Sizes.size10,
+                        child: Column(
+                          children: [
+                            IconButton(
+                              color: Colors.white,
+                              onPressed: _toggleSelfieMode,
+                              icon: const Icon(Icons.cameraswitch_outlined),
+                            ),
+                            Gaps.v10,
+                            for (var flashButton in flashButtons)
+                              FlashModeIcon(
+                                isSelected:
+                                    _flashMode == flashButton["flashMode"],
+                                icon: flashButton["icon"],
+                                flashMode: flashButton["flashMode"],
+                                setFlashMode: _setFlashMode,
+                              )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+      ),
+    );
+  }
+}
+
+class PermissionDenied extends StatelessWidget {
+  const PermissionDenied({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          "Permissions Denied",
+          style: TextStyle(fontSize: Sizes.size18),
+        ),
+        Gaps.v20,
+        Text(
+          "Please Change Permissions on Settings",
+          style: TextStyle(fontSize: Sizes.size16),
+        ),
+      ],
+    );
+  }
+}
+
+class Initializing extends StatelessWidget {
+  const Initializing({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          "Initializing...",
+          style: TextStyle(fontSize: Sizes.size18),
+        ),
+        Gaps.v20,
+        CircularProgressIndicator.adaptive(),
+      ],
     );
   }
 }
