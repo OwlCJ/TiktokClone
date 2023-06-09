@@ -187,6 +187,10 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
     );
   }
 
+  void _onPanUpdate(DragUpdateDetails details) {
+    print(details);
+  }
+
   @override
   void dispose() {
     _progressAnimationController.dispose();
@@ -237,6 +241,7 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
                             const Spacer(),
                             GestureDetector(
                               onTapDown: _startRecording,
+                              onPanUpdate: _onPanUpdate,
                               onTapUp: (details) => _stopRecording(),
                               child: ScaleTransition(
                                 scale: _buttonAnimation,
