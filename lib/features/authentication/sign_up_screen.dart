@@ -13,7 +13,7 @@ class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
 
   void _onLoginTap(BuildContext context) {
-    context.push(LoginScreen.routeName);
+    context.pushNamed(LoginScreen.routeName);
   }
 
   void _onEmailtap(BuildContext context) {
@@ -36,7 +36,8 @@ class SignUpScreen extends StatelessWidget {
     //     },
     //   ),
     // );
-    context.pushNamed(UsernameScreen.routeName);
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const UsernameScreen()));
   }
 
   @override

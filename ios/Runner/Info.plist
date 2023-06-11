@@ -51,5 +51,7 @@
 	<string>We needs your camera permission for tiktok uploading</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We needs your microphone permission for tiktok uploading</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We needs your Album permission for video saving</string>
 </dict>
 </plist>
