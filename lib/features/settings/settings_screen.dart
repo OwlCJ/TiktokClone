@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:tiktok_clone/common/widgets/main_navigation/widgets/video_config/video_config.dart';
 import 'package:tiktok_clone/constants/breakpoints.dart';
+import 'package:tiktok_clone/theme.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -33,6 +35,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             body: ListView(
               children: [
+                AnimatedBuilder(
+                  animation: videoConfig,
+                  builder: (context, child) => SwitchListTile.adaptive(
+                    value: videoConfig.value,
+                    onChanged: (value) {
+                      videoConfig.value = !videoConfig.value;
+                    },
+                    title: const Text("All Muted"),
+                    subtitle: const Text("All Video's muted"),
+                  ),
+                ),
+                ValueListenableBuilder(
+                  valueListenable: darkMode,
+                  builder: (context, value, child) => SwitchListTile.adaptive(
+                    value: value,
+                    onChanged: (value) {
+                      darkMode.value = !darkMode.value;
+                    },
+                    title: const Text("DarkTheme Mode"),
+                    subtitle: const Text("Change app's theme Light/Dark"),
+                  ),
+                ),
                 SwitchListTile.adaptive(
                   value: _notifications,
                   onChanged: _onNotificationsChanged,
