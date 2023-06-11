@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -28,6 +31,8 @@ final List flashButtons = [
 ];
 
 class VideoRecordingScreen extends StatefulWidget {
+  static const String routeName = 'postVideo';
+  static const String routeURL = '/upload';
   const VideoRecordingScreen({super.key});
 
   @override
@@ -41,6 +46,11 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
 
   bool _isSelfieMode = false;
   bool _isAppInactive = false;
+
+  double _zoomLevel = 1.0;
+  double _maxZoomLevel = 1.0;
+
+  late final bool _noCamera = kDebugMode && Platform.isIOS;
 
   late final AnimationController _buttonAnimationConroller =
       AnimationController(
@@ -78,6 +88,8 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
     await _cameraController.prepareForVideoRecording();
     _flashMode = _cameraController.value.flashMode;
 
+    _maxZoomLevel = await _cameraController.getMaxZoomLevel();
+
     setState(() {});
   }
 
@@ -93,7 +105,8 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
     if (!cameraDenied && !micDenied) {
       _hasPermission = true;
       await initCamera();
-    } else {
+    } //TODO: For Debug ios simulator
+    else {
       _permissionDenied = true;
     }
     setState(() {});
@@ -102,7 +115,14 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
   @override
   void initState() {
     super.initState();
-    initPermissions();
+    if (!_noCamera) {
+      initPermissions();
+    } else {
+      setState(() {
+        _hasPermission = true;
+      });
+    }
+
     WidgetsBinding.instance.addObserver(this);
     _progressAnimationController.addListener(() {
       setState(() {});
@@ -117,6 +137,7 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!_noCamera) return;
     if (!_hasPermission) return;
     if (!_cameraController.value.isInitialized) return;
     if (state == AppLifecycleState.inactive) {
@@ -156,6 +177,7 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
     _progressAnimationController.reset();
 
     final video = await _cameraController.stopVideoRecording();
+
     //TODO: !mounted 이해
     if (!mounted) return;
 
@@ -188,14 +210,27 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
   }
 
   void _onPanUpdate(DragUpdateDetails details) {
-    print(details);
+    if (!_cameraController.value.isRecordingVideo) return;
+
+    double zoomLevelScale = 0.05;
+    if (details.delta.dy < 0) {
+      if (_zoomLevel >= _maxZoomLevel) return;
+      _zoomLevel += zoomLevelScale;
+      _cameraController.setZoomLevel(_zoomLevel);
+    } else if (details.delta.dy > 0) {
+      if (_zoomLevel <= 1.0) return;
+      _zoomLevel -= zoomLevelScale;
+      _cameraController.setZoomLevel(_zoomLevel);
+    }
   }
 
   @override
   void dispose() {
     _progressAnimationController.dispose();
     _buttonAnimationConroller.dispose();
-    _cameraController.dispose();
+    if (!_noCamera) {
+      _cameraController.dispose();
+    }
     super.dispose();
   }
 
@@ -205,34 +240,42 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
       body: Center(
         child: _permissionDenied
             ? const PermissionDenied()
-            : !_hasPermission || !_cameraController.value.isInitialized
+            : !_hasPermission
                 ? const Initializing()
                 : Stack(
                     alignment: Alignment.center,
                     children: [
-                      if (!_isAppInactive) CameraPreview(_cameraController),
-                      Positioned(
-                        top: Sizes.size20,
-                        right: Sizes.size10,
-                        child: Column(
-                          children: [
-                            IconButton(
-                              color: Colors.white,
-                              onPressed: _toggleSelfieMode,
-                              icon: const Icon(Icons.cameraswitch_outlined),
-                            ),
-                            Gaps.v10,
-                            for (var flashButton in flashButtons)
-                              FlashModeIcon(
-                                isSelected:
-                                    _flashMode == flashButton["flashMode"],
-                                icon: flashButton["icon"],
-                                flashMode: flashButton["flashMode"],
-                                setFlashMode: _setFlashMode,
-                              )
-                          ],
+                      if (!_noCamera &&
+                          !_isAppInactive &&
+                          _cameraController.value.isInitialized)
+                        CameraPreview(_cameraController),
+                      const Positioned(
+                          top: Sizes.size40,
+                          left: Sizes.size20,
+                          child: CloseButton()),
+                      if (!_noCamera)
+                        Positioned(
+                          top: Sizes.size20,
+                          right: Sizes.size10,
+                          child: Column(
+                            children: [
+                              IconButton(
+                                color: Colors.white,
+                                onPressed: _toggleSelfieMode,
+                                icon: const Icon(Icons.cameraswitch_outlined),
+                              ),
+                              Gaps.v10,
+                              for (var flashButton in flashButtons)
+                                FlashModeIcon(
+                                  isSelected:
+                                      _flashMode == flashButton["flashMode"],
+                                  icon: flashButton["icon"],
+                                  flashMode: flashButton["flashMode"],
+                                  setFlashMode: _setFlashMode,
+                                )
+                            ],
+                          ),
                         ),
-                      ),
                       Positioned(
                         width: MediaQuery.of(context).size.width,
                         bottom: Sizes.size40,

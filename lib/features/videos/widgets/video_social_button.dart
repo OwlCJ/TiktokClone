@@ -20,7 +20,7 @@ class VideoSocialButton extends StatelessWidget {
         FaIcon(
           icon,
           color: Colors.white,
-          size: Sizes.size32,
+          size: Sizes.size28,
         ),
         Gaps.v5,
         Text(
