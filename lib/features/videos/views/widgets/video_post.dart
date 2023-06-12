@@ -1,12 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:tiktok_clone/common/widgets/main_navigation/widgets/video_config/video_config.dart';
+import 'package:provider/provider.dart';
 import 'package:tiktok_clone/constants/breakpoints.dart';
 import 'package:tiktok_clone/constants/gaps.dart';
 import 'package:tiktok_clone/constants/sizes.dart';
-import 'package:tiktok_clone/features/videos/widgets/video_comments.dart';
-import 'package:tiktok_clone/features/videos/widgets/video_social_button.dart';
+import 'package:tiktok_clone/features/videos/view_models/playback_config_vm.dart';
+import 'package:tiktok_clone/features/videos/views/widgets/video_comments.dart';
+import 'package:tiktok_clone/features/videos/views/widgets/video_social_button.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -31,8 +32,7 @@ class _VideoPostState extends State<VideoPost>
   final Duration _animationDuration = const Duration(milliseconds: 200);
   late final AnimationController _animationController;
   bool _isPaused = false;
-
-  bool _autoMute = videoConfig.value;
+  late bool _isMuted;
 
   void _onVideoChange() {
     if (_videoPlayerController.value.isInitialized) {
@@ -69,11 +69,8 @@ class _VideoPostState extends State<VideoPost>
       duration: _animationDuration,
     );
 
-    videoConfig.addListener(() {
-      setState(() {
-        _autoMute = videoConfig.value;
-      });
-    });
+    _isMuted = context.read<PlaybackConfigViewModel>().muted;
+    _onPlaybackMutedInitialize();
   }
 
   @override
@@ -89,7 +86,10 @@ class _VideoPostState extends State<VideoPost>
     if (info.visibleFraction == 1 &&
         !_isPaused &&
         !_videoPlayerController.value.isPlaying) {
-      _videoPlayerController.play();
+      final autoplay = context.read<PlaybackConfigViewModel>().autoplay;
+      if (autoplay) {
+        _videoPlayerController.play();
+      }
     }
     if (_videoPlayerController.value.isPlaying && info.visibleFraction == 0) {
       _onToggleVideo();
@@ -129,12 +129,23 @@ class _VideoPostState extends State<VideoPost>
   }
 
   void _onVideoVolumeToggle() {
-    if (_videoPlayerController.value.volume == 0) {
-      _videoPlayerController.setVolume(100);
+    if (_isMuted) {
+      _videoPlayerController.setVolume(1);
+      _isMuted = false;
     } else {
       _videoPlayerController.setVolume(0);
+      _isMuted = true;
     }
     setState(() {});
+  }
+
+  void _onPlaybackMutedInitialize() {
+    if (!mounted) return;
+    if (_isMuted) {
+      _videoPlayerController.setVolume(0);
+    } else {
+      _videoPlayerController.setVolume(1);
+    }
   }
 
   @override
@@ -240,7 +251,7 @@ class _VideoPostState extends State<VideoPost>
                 GestureDetector(
                   onTap: _onVideoVolumeToggle,
                   child: VideoSocialButton(
-                      icon: _videoPlayerController.value.volume == 0
+                      icon: _isMuted
                           ? FontAwesomeIcons.volumeXmark
                           : FontAwesomeIcons.volumeHigh,
                       text: ""),

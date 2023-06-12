@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:tiktok_clone/common/widgets/main_navigation/widgets/video_config/video_config.dart';
+import 'package:provider/provider.dart';
 import 'package:tiktok_clone/constants/breakpoints.dart';
+import 'package:tiktok_clone/features/videos/view_models/playback_config_vm.dart';
 import 'package:tiktok_clone/theme.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -35,16 +36,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             body: ListView(
               children: [
-                AnimatedBuilder(
-                  animation: videoConfig,
-                  builder: (context, child) => SwitchListTile.adaptive(
-                    value: videoConfig.value,
-                    onChanged: (value) {
-                      videoConfig.value = !videoConfig.value;
-                    },
-                    title: const Text("All Muted"),
-                    subtitle: const Text("All Video's muted"),
-                  ),
+                SwitchListTile.adaptive(
+                  value: context.watch<PlaybackConfigViewModel>().muted,
+                  onChanged: (value) =>
+                      context.read<PlaybackConfigViewModel>().setMuted(value),
+                  title: const Text("Mute Video"),
+                  subtitle: const Text("Video will be muted by default."),
+                ),
+                SwitchListTile.adaptive(
+                  value: context.watch<PlaybackConfigViewModel>().autoplay,
+                  onChanged: (value) => context
+                      .read<PlaybackConfigViewModel>()
+                      .setAutoplay(value),
+                  title: const Text("AutoPlay"),
+                  subtitle:
+                      const Text("Video will start playing automatically."),
                 ),
                 ValueListenableBuilder(
                   valueListenable: darkMode,
