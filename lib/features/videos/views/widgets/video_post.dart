@@ -1,15 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tiktok_clone/constants/breakpoints.dart';
 import 'package:tiktok_clone/constants/gaps.dart';
 import 'package:tiktok_clone/constants/sizes.dart';
-import 'package:tiktok_clone/features/videos/widgets/video_comments.dart';
-import 'package:tiktok_clone/features/videos/widgets/video_social_button.dart';
+import 'package:tiktok_clone/features/videos/view_models/playback_config_vm.dart';
+import 'package:tiktok_clone/features/videos/views/widgets/video_comments.dart';
+import 'package:tiktok_clone/features/videos/views/widgets/video_social_button.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-class VideoPost extends StatefulWidget {
+class VideoPost extends ConsumerStatefulWidget {
   final Function onVideoFinished;
   final int index;
 
@@ -20,10 +22,10 @@ class VideoPost extends StatefulWidget {
   });
 
   @override
-  State<VideoPost> createState() => _VideoPostState();
+  VideoPostState createState() => VideoPostState();
 }
 
-class _VideoPostState extends State<VideoPost>
+class VideoPostState extends ConsumerState<VideoPost>
     with SingleTickerProviderStateMixin {
   late final VideoPlayerController _videoPlayerController;
 
@@ -65,6 +67,8 @@ class _VideoPostState extends State<VideoPost>
       value: 1.5,
       duration: _animationDuration,
     );
+
+    _onPlaybackMutedInitialize();
   }
 
   @override
@@ -80,7 +84,9 @@ class _VideoPostState extends State<VideoPost>
     if (info.visibleFraction == 1 &&
         !_isPaused &&
         !_videoPlayerController.value.isPlaying) {
-      _videoPlayerController.play();
+      if (ref.read(plyabackConfigProvider).autoplay) {
+        _videoPlayerController.play();
+      }
     }
     if (_videoPlayerController.value.isPlaying && info.visibleFraction == 0) {
       _onToggleVideo();
@@ -120,12 +126,23 @@ class _VideoPostState extends State<VideoPost>
   }
 
   void _onVideoVolumeToggle() {
-    if (_videoPlayerController.value.volume == 0) {
-      _videoPlayerController.setVolume(100);
+    if (!mounted) return;
+    final muted = ref.read(plyabackConfigProvider).muted;
+    if (muted) {
+      _videoPlayerController.setVolume(1);
     } else {
       _videoPlayerController.setVolume(0);
     }
-    setState(() {});
+    ref.read(plyabackConfigProvider.notifier).setMuted(!muted);
+  }
+
+  void _onPlaybackMutedInitialize() {
+    if (!mounted) return;
+    if (ref.read(plyabackConfigProvider).muted) {
+      _videoPlayerController.setVolume(0);
+    } else {
+      _videoPlayerController.setVolume(1);
+    }
   }
 
   @override
@@ -231,7 +248,7 @@ class _VideoPostState extends State<VideoPost>
                 GestureDetector(
                   onTap: _onVideoVolumeToggle,
                   child: VideoSocialButton(
-                      icon: _videoPlayerController.value.volume == 0
+                      icon: ref.watch(plyabackConfigProvider).muted
                           ? FontAwesomeIcons.volumeXmark
                           : FontAwesomeIcons.volumeHigh,
                       text: ""),
