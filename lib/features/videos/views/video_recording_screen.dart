@@ -45,7 +45,7 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
   bool _permissionDenied = false;
 
   bool _isSelfieMode = false;
-  bool _isAppInactive = false;
+  // bool _isAppInactive = false;
 
   double _zoomLevel = 1.0;
   double _maxZoomLevel = 1.0;
@@ -137,14 +137,14 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (!_noCamera) return;
+    if (_noCamera) return;
     if (!_hasPermission) return;
     if (!_cameraController.value.isInitialized) return;
     if (state == AppLifecycleState.inactive) {
-      _isAppInactive = true;
+      // _isAppInactive = true;
       _cameraController.dispose();
     } else if (state == AppLifecycleState.resumed) {
-      _isAppInactive = false;
+      // _isAppInactive = false;
       initCamera();
     }
   }
@@ -246,7 +246,7 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
                     alignment: Alignment.center,
                     children: [
                       if (!_noCamera &&
-                          !_isAppInactive &&
+                          // !_isAppInactive &&
                           _cameraController.value.isInitialized)
                         CameraPreview(_cameraController),
                       const Positioned(

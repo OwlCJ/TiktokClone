@@ -32,7 +32,6 @@ class VideoPostState extends ConsumerState<VideoPost>
   final Duration _animationDuration = const Duration(milliseconds: 200);
   late final AnimationController _animationController;
   bool _isPaused = false;
-  // late bool _isMuted = false;
 
   void _onVideoChange() {
     if (_videoPlayerController.value.isInitialized) {
