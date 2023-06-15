@@ -1,15 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tiktok_clone/constants/breakpoints.dart';
 import 'package:tiktok_clone/constants/gaps.dart';
 import 'package:tiktok_clone/constants/sizes.dart';
+import 'package:tiktok_clone/features/videos/view_models/playback_config_vm.dart';
 import 'package:tiktok_clone/features/videos/views/widgets/video_comments.dart';
 import 'package:tiktok_clone/features/videos/views/widgets/video_social_button.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-class VideoPost extends StatefulWidget {
+class VideoPost extends ConsumerStatefulWidget {
   final Function onVideoFinished;
   final int index;
 
@@ -20,17 +22,17 @@ class VideoPost extends StatefulWidget {
   });
 
   @override
-  State<VideoPost> createState() => _VideoPostState();
+  VideoPostState createState() => VideoPostState();
 }
 
-class _VideoPostState extends State<VideoPost>
+class VideoPostState extends ConsumerState<VideoPost>
     with SingleTickerProviderStateMixin {
   late final VideoPlayerController _videoPlayerController;
 
   final Duration _animationDuration = const Duration(milliseconds: 200);
   late final AnimationController _animationController;
   bool _isPaused = false;
-  late bool _isMuted = false;
+  // late bool _isMuted = false;
 
   void _onVideoChange() {
     if (_videoPlayerController.value.isInitialized) {
@@ -67,7 +69,6 @@ class _VideoPostState extends State<VideoPost>
       duration: _animationDuration,
     );
 
-    // _isMuted = context.read<PlaybackConfigViewModel>().muted;
     _onPlaybackMutedInitialize();
   }
 
@@ -84,8 +85,7 @@ class _VideoPostState extends State<VideoPost>
     if (info.visibleFraction == 1 &&
         !_isPaused &&
         !_videoPlayerController.value.isPlaying) {
-      // final autoplay = context.read<PlaybackConfigViewModel>().autoplay;
-      if (false) {
+      if (ref.read(plyabackConfigProvider).autoplay) {
         _videoPlayerController.play();
       }
     }
@@ -127,19 +127,19 @@ class _VideoPostState extends State<VideoPost>
   }
 
   void _onVideoVolumeToggle() {
-    if (_isMuted) {
+    if (!mounted) return;
+    final muted = ref.read(plyabackConfigProvider).muted;
+    if (muted) {
       _videoPlayerController.setVolume(1);
-      _isMuted = false;
     } else {
       _videoPlayerController.setVolume(0);
-      _isMuted = true;
     }
-    setState(() {});
+    ref.read(plyabackConfigProvider.notifier).setMuted(!muted);
   }
 
   void _onPlaybackMutedInitialize() {
     if (!mounted) return;
-    if (_isMuted) {
+    if (ref.read(plyabackConfigProvider).muted) {
       _videoPlayerController.setVolume(0);
     } else {
       _videoPlayerController.setVolume(1);
@@ -249,7 +249,7 @@ class _VideoPostState extends State<VideoPost>
                 GestureDetector(
                   onTap: _onVideoVolumeToggle,
                   child: VideoSocialButton(
-                      icon: _isMuted
+                      icon: ref.watch(plyabackConfigProvider).muted
                           ? FontAwesomeIcons.volumeXmark
                           : FontAwesomeIcons.volumeHigh,
                       text: ""),

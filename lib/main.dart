@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tiktok_clone/constants/sizes.dart';
 import 'package:tiktok_clone/features/videos/repos/video_playback_config_repo.dart';
+import 'package:tiktok_clone/features/videos/view_models/playback_config_vm.dart';
 import 'package:tiktok_clone/router.dart';
-import 'package:tiktok_clone/theme.dart';
 
 void main() async {
   // 모든 위젯들이 앱 시작전에 확실히 바인딩 되었는지 확인
@@ -18,7 +18,15 @@ void main() async {
 
   // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
 
-  runApp(const ProviderScope(child: TikTokApp()));
+  runApp(
+    ProviderScope(
+      overrides: [
+        plyabackConfigProvider
+            .overrideWith(() => PlaybackConfigViewModel(repository))
+      ],
+      child: const TikTokApp(),
+    ),
+  );
 }
 
 class TikTokApp extends StatelessWidget {
@@ -30,8 +38,8 @@ class TikTokApp extends StatelessWidget {
       routerConfig: router,
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      // themeMode: ThemeMode.system,
-      themeMode: darkMode.value ? ThemeMode.dark : ThemeMode.light,
+      themeMode: ThemeMode.system,
+      // themeMode: darkMode.value ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData(
         brightness: Brightness.light,
         bottomAppBarTheme: BottomAppBarTheme(color: Colors.grey.shade50),
