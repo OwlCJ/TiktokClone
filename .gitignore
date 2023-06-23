@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/flutter,dart,macos
-# Edit at https://www.toptal.com/developers/gitignore?templates=flutter,dart,macos
+# Created by https://www.toptal.com/developers/gitignore/api/macos,dart,flutter,firebase
+# Edit at https://www.toptal.com/developers/gitignore?templates=macos,dart,flutter,firebase
 
 ### Dart ###
 # See https://www.dartlang.org/guides/libraries/private-files
@@ -34,6 +34,21 @@ doc/api/
 # dotenv environment variables file
 .env
 
+### Firebase ###
+.idea
+**/node_modules/*
+**/.firebaserc
+
+### Firebase Patch ###
+.runtimeconfig.json
+.firebase/
+
+### Firebase Temp ###
+GoogleService-info.plist
+firebase_options.dart
+google-services.json
+firebase_app_id_file.json
+
 ### Flutter ###
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -46,8 +61,6 @@ lib/generated_plugin_registrant.dart
 # Regenerating the pubspec.lock file lets you test your package against the latest compatible versions of its dependencies.
 # See https://dart.dev/guides/libraries/private-files#pubspeclock
 #pubspec.lock
-
-**/assets/videos/
 
 # Android related
 **/android/**/gradle-wrapper.jar
@@ -128,4 +141,4 @@ Temporary Items
 # iCloud generated files
 *.icloud
 
-# End of https://www.toptal.com/developers/gitignore/api/flutter,dart,macos
+# End of https://www.toptal.com/developers/gitignore/api/macos,dart,flutter,firebase
