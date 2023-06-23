@@ -31,6 +31,14 @@ class _UserprofileScreenState extends ConsumerState<UserprofileScreen> {
     ));
   }
 
+  // void _onEditPressed(UserProfileModel data) {
+  //   Navigator.of(context).push(
+  //     MaterialPageRoute(
+  //       builder: (context) => const ProfileEditScreen(),
+  //     ),
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
     return ref.watch(usersProvider).when(
@@ -53,19 +61,27 @@ class _UserprofileScreenState extends ConsumerState<UserprofileScreen> {
                       headerSliverBuilder: (context, innerBoxIsScrolled) {
                         return [
                           SliverAppBar(
+                            centerTitle: true,
                             title: Text(data.name),
                             actions: [
                               IconButton(
                                 onPressed: _onGearPressed,
-                                icon: const FaIcon(FontAwesomeIcons.gear),
-                              )
+                                icon: const FaIcon(
+                                  FontAwesomeIcons.gear,
+                                  size: Sizes.size18,
+                                ),
+                              ),
                             ],
                           ),
                           SliverToBoxAdapter(
                             child: Column(
                               children: [
                                 Gaps.v20,
-                                Avatar(name: data.name),
+                                Avatar(
+                                  uid: data.uid,
+                                  name: data.name,
+                                  hasAvatar: data.hasAvatar,
+                                ),
                                 Gaps.v20,
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
