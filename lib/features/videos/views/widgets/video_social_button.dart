@@ -6,11 +6,13 @@ import 'package:tiktok_clone/constants/sizes.dart';
 class VideoSocialButton extends StatelessWidget {
   final IconData icon;
   final String text;
+  final Color color;
 
   const VideoSocialButton({
     super.key,
     required this.icon,
     required this.text,
+    required this.color,
   });
 
   @override
@@ -19,7 +21,7 @@ class VideoSocialButton extends StatelessWidget {
       children: [
         FaIcon(
           icon,
-          color: Colors.white,
+          color: color,
           size: Sizes.size28,
         ),
         Gaps.v5,

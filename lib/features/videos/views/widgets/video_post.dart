@@ -7,6 +7,7 @@ import 'package:tiktok_clone/constants/gaps.dart';
 import 'package:tiktok_clone/constants/sizes.dart';
 import 'package:tiktok_clone/features/videos/models/video_model.dart';
 import 'package:tiktok_clone/features/videos/view_models/playback_config_vm.dart';
+import 'package:tiktok_clone/features/videos/view_models/video_post_view_models.dart';
 import 'package:tiktok_clone/features/videos/views/widgets/video_comments.dart';
 import 'package:tiktok_clone/features/videos/views/widgets/video_social_button.dart';
 import 'package:video_player/video_player.dart';
@@ -35,6 +36,8 @@ class VideoPostState extends ConsumerState<VideoPost>
   final Duration _animationDuration = const Duration(milliseconds: 200);
   late final AnimationController _animationController;
   bool _isPaused = false;
+  late int _likesCount = widget.videoData.likes;
+  late bool _isLiked = false;
 
   void _onVideoChange() {
     if (_videoPlayerController.value.isInitialized) {
@@ -58,10 +61,20 @@ class VideoPostState extends ConsumerState<VideoPost>
     setState(() {});
   }
 
+  void _initIsLiked() async {
+    _isLiked = await ref
+        .read(videoPostProvider(widget.videoData.id).notifier)
+        .isLiked();
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _initVideoPlayer();
+    _initIsLiked();
 
     _animationController = AnimationController(
       vsync: this,
@@ -137,6 +150,18 @@ class VideoPostState extends ConsumerState<VideoPost>
       _videoPlayerController.setVolume(0);
     }
     ref.read(plyabackConfigProvider.notifier).setMuted(!muted);
+  }
+
+  void _onLikeTap() {
+    if (_isLiked) {
+      _isLiked = false;
+      _likesCount -= 1;
+    } else {
+      _isLiked = true;
+      _likesCount += 1;
+    }
+    setState(() {});
+    ref.read(videoPostProvider(widget.videoData.id).notifier).likeVideo();
   }
 
   void _onPlaybackMutedInitialize() {
@@ -233,9 +258,13 @@ class VideoPostState extends ConsumerState<VideoPost>
                   child: Text(widget.videoData.creator),
                 ),
                 Gaps.v28,
-                VideoSocialButton(
-                  icon: FontAwesomeIcons.solidHeart,
-                  text: "${widget.videoData.likes}",
+                GestureDetector(
+                  onTap: _onLikeTap,
+                  child: VideoSocialButton(
+                    icon: FontAwesomeIcons.solidHeart,
+                    text: "$_likesCount",
+                    color: _isLiked ? Colors.red : Colors.white,
+                  ),
                 ),
                 Gaps.v24,
                 GestureDetector(
@@ -243,21 +272,25 @@ class VideoPostState extends ConsumerState<VideoPost>
                   child: VideoSocialButton(
                     icon: FontAwesomeIcons.solidComment,
                     text: "${widget.videoData.comments}",
+                    color: Colors.white,
                   ),
                 ),
                 Gaps.v24,
                 const VideoSocialButton(
                   icon: FontAwesomeIcons.share,
                   text: "2.9M",
+                  color: Colors.white,
                 ),
                 Gaps.v24,
                 GestureDetector(
                   onTap: _onVideoVolumeToggle,
                   child: VideoSocialButton(
-                      icon: ref.watch(plyabackConfigProvider).muted
-                          ? FontAwesomeIcons.volumeXmark
-                          : FontAwesomeIcons.volumeHigh,
-                      text: ""),
+                    icon: ref.watch(plyabackConfigProvider).muted
+                        ? FontAwesomeIcons.volumeXmark
+                        : FontAwesomeIcons.volumeHigh,
+                    text: "",
+                    color: Colors.white,
+                  ),
                 )
               ],
             ),
