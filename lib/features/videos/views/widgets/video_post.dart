@@ -5,7 +5,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tiktok_clone/constants/breakpoints.dart';
 import 'package:tiktok_clone/constants/gaps.dart';
 import 'package:tiktok_clone/constants/sizes.dart';
+import 'package:tiktok_clone/features/videos/models/video_model.dart';
 import 'package:tiktok_clone/features/videos/view_models/playback_config_vm.dart';
+import 'package:tiktok_clone/features/videos/view_models/video_post_view_models.dart';
 import 'package:tiktok_clone/features/videos/views/widgets/video_comments.dart';
 import 'package:tiktok_clone/features/videos/views/widgets/video_social_button.dart';
 import 'package:video_player/video_player.dart';
@@ -14,9 +16,11 @@ import 'package:visibility_detector/visibility_detector.dart';
 class VideoPost extends ConsumerStatefulWidget {
   final Function onVideoFinished;
   final int index;
+  final VideoModel videoData;
 
   const VideoPost({
     super.key,
+    required this.videoData,
     required this.onVideoFinished,
     required this.index,
   });
@@ -32,6 +36,8 @@ class VideoPostState extends ConsumerState<VideoPost>
   final Duration _animationDuration = const Duration(milliseconds: 200);
   late final AnimationController _animationController;
   bool _isPaused = false;
+  late int _likesCount = widget.videoData.likes;
+  late bool _isLiked = false;
 
   void _onVideoChange() {
     if (_videoPlayerController.value.isInitialized) {
@@ -55,10 +61,20 @@ class VideoPostState extends ConsumerState<VideoPost>
     setState(() {});
   }
 
+  void _initIsLiked() async {
+    _isLiked = await ref
+        .read(videoPostProvider(widget.videoData.id).notifier)
+        .isLiked();
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _initVideoPlayer();
+    _initIsLiked();
 
     _animationController = AnimationController(
       vsync: this,
@@ -136,6 +152,18 @@ class VideoPostState extends ConsumerState<VideoPost>
     ref.read(plyabackConfigProvider.notifier).setMuted(!muted);
   }
 
+  void _onLikeTap() {
+    if (_isLiked) {
+      _isLiked = false;
+      _likesCount -= 1;
+    } else {
+      _isLiked = true;
+      _likesCount += 1;
+    }
+    setState(() {});
+    ref.read(videoPostProvider(widget.videoData.id).notifier).likeVideo();
+  }
+
   void _onPlaybackMutedInitialize() {
     if (!mounted) return;
     if (ref.read(plyabackConfigProvider).muted) {
@@ -156,7 +184,10 @@ class VideoPostState extends ConsumerState<VideoPost>
             child: Container(
               child: _videoPlayerController.value.isInitialized
                   ? VideoPlayer(_videoPlayerController)
-                  : Container(color: Colors.black),
+                  : Container(
+                      color: Colors.black,
+                      child: const CircularProgressIndicator(),
+                    ),
             ),
           ),
           Positioned.fill(
@@ -188,15 +219,15 @@ class VideoPostState extends ConsumerState<VideoPost>
               ),
             ),
           ),
-          const Positioned(
+          Positioned(
             bottom: 25,
             left: 10,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "@CJ",
-                  style: TextStyle(
+                  "@${widget.videoData.creator}",
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: Sizes.size20,
                     fontWeight: FontWeight.bold,
@@ -204,8 +235,8 @@ class VideoPostState extends ConsumerState<VideoPost>
                 ),
                 Gaps.v10,
                 Text(
-                  "A forest road that is so nice",
-                  style: TextStyle(
+                  widget.videoData.description,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: Sizes.size16,
                   ),
@@ -218,40 +249,48 @@ class VideoPostState extends ConsumerState<VideoPost>
             right: 10,
             child: Column(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   backgroundColor: Colors.black,
                   foregroundColor: Colors.white,
                   radius: 25,
                   foregroundImage: NetworkImage(
-                      "https://avatars.githubusercontent.com/u/81318468?v=4"),
-                  child: Text("CJ"),
+                      "https://firebasestorage.googleapis.com/v0/b/owlcj-tiktok-clone.appspot.com/o/avatars%2F${widget.videoData.creatorUid}?alt=media"),
+                  child: Text(widget.videoData.creator),
                 ),
                 Gaps.v28,
-                const VideoSocialButton(
-                  icon: FontAwesomeIcons.solidHeart,
-                  text: "2.9M",
+                GestureDetector(
+                  onTap: _onLikeTap,
+                  child: VideoSocialButton(
+                    icon: FontAwesomeIcons.solidHeart,
+                    text: "$_likesCount",
+                    color: _isLiked ? Colors.red : Colors.white,
+                  ),
                 ),
                 Gaps.v24,
                 GestureDetector(
                   onTap: _onCommentsTap,
-                  child: const VideoSocialButton(
+                  child: VideoSocialButton(
                     icon: FontAwesomeIcons.solidComment,
-                    text: "33K",
+                    text: "${widget.videoData.comments}",
+                    color: Colors.white,
                   ),
                 ),
                 Gaps.v24,
                 const VideoSocialButton(
                   icon: FontAwesomeIcons.share,
                   text: "2.9M",
+                  color: Colors.white,
                 ),
                 Gaps.v24,
                 GestureDetector(
                   onTap: _onVideoVolumeToggle,
                   child: VideoSocialButton(
-                      icon: ref.watch(plyabackConfigProvider).muted
-                          ? FontAwesomeIcons.volumeXmark
-                          : FontAwesomeIcons.volumeHigh,
-                      text: ""),
+                    icon: ref.watch(plyabackConfigProvider).muted
+                        ? FontAwesomeIcons.volumeXmark
+                        : FontAwesomeIcons.volumeHigh,
+                    text: "",
+                    color: Colors.white,
+                  ),
                 )
               ],
             ),
