@@ -57,7 +57,7 @@ class UsersViewModel extends AsyncNotifier<UserProfileModel> {
     required String bio,
     required String link,
   }) async {
-    final uid = _authenticationRepository.user!.uid;
+    // final uid = _authenticationRepository.user!.uid;
     state = AsyncValue.data(state.value!.copyWith(bio: bio, link: link));
   }
 }

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tiktok_clone/constants/breakpoints.dart';
 import 'package:tiktok_clone/constants/gaps.dart';
 import 'package:tiktok_clone/constants/sizes.dart';
+import 'package:tiktok_clone/features/authentication/repos/authentication_repo.dart';
+import 'package:tiktok_clone/features/inbox/view_models/messages_view_model.dart';
 import 'package:tiktok_clone/utils.dart';
 
-class ChatDetailScreen extends StatefulWidget {
+class ChatDetailScreen extends ConsumerStatefulWidget {
   static const String routeName = "chatDetail";
   static const String routeURL = ":chatId";
 
@@ -14,15 +17,24 @@ class ChatDetailScreen extends StatefulWidget {
   const ChatDetailScreen({super.key, required this.chatId});
 
   @override
-  State<ChatDetailScreen> createState() => _ChatDetailScreenState();
+  ConsumerState<ChatDetailScreen> createState() => _ChatDetailScreenState();
 }
 
-class _ChatDetailScreenState extends State<ChatDetailScreen> {
+class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
   late final TextEditingController _textEditingController =
       TextEditingController();
 
   void _onTextFieldUnFocus() {
     FocusScope.of(context).unfocus();
+  }
+
+  void _onSendPressed() {
+    final text = _textEditingController.text;
+    if (text == "") {
+      return;
+    }
+    ref.read(messagesProvider.notifier).sendMessage(text);
+    _textEditingController.text = "";
   }
 
   @override
@@ -34,6 +46,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = isDarkMode(context);
+    final isLoading = ref.watch(messagesProvider).isLoading;
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: Breakpoints.lg),
@@ -96,50 +109,64 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             children: [
               GestureDetector(
                 onTap: _onTextFieldUnFocus,
-                child: ListView.separated(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: Sizes.size20,
-                    horizontal: Sizes.size14,
-                  ),
-                  itemBuilder: (context, index) {
-                    final isMine = index % 2 == 0;
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: isMine
-                          ? MainAxisAlignment.end
-                          : MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(Sizes.size14),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                              topLeft: const Radius.circular(Sizes.size16),
-                              topRight: const Radius.circular(Sizes.size16),
-                              bottomLeft: Radius.circular(
-                                  isMine ? Sizes.size16 : Sizes.size5),
-                              bottomRight: Radius.circular(
-                                  !isMine ? Sizes.size16 : Sizes.size4),
-                            ),
-                            color: isMine
-                                ? Colors.blue
-                                : Theme.of(context).primaryColor,
+                child: ref.watch(chatProvider).when(
+                      data: (data) {
+                        return ListView.separated(
+                          keyboardDismissBehavior:
+                              ScrollViewKeyboardDismissBehavior.onDrag,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: Sizes.size20,
+                            horizontal: Sizes.size14,
                           ),
-                          child: const Text(
-                            'This is a message',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: Sizes.size16,
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                  separatorBuilder: (context, index) => Gaps.v10,
-                  itemCount: 10,
-                ),
+                          itemBuilder: (context, index) {
+                            final message = data[index];
+                            final isMine =
+                                message.uid == ref.watch(authRepo).user!.uid;
+                            return Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: isMine
+                                  ? MainAxisAlignment.end
+                                  : MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(Sizes.size14),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft:
+                                          const Radius.circular(Sizes.size16),
+                                      topRight:
+                                          const Radius.circular(Sizes.size16),
+                                      bottomLeft: Radius.circular(
+                                          isMine ? Sizes.size16 : Sizes.size5),
+                                      bottomRight: Radius.circular(
+                                          !isMine ? Sizes.size16 : Sizes.size4),
+                                    ),
+                                    color: isMine
+                                        ? Colors.blue
+                                        : Theme.of(context).primaryColor,
+                                  ),
+                                  child: Text(
+                                    message.text,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: Sizes.size16,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                          separatorBuilder: (context, index) => Gaps.v10,
+                          itemCount: data.length,
+                        );
+                      },
+                      error: ((error, stackTrace) => Center(
+                            child: Text(error.toString()),
+                          )),
+                      loading: () => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
               ),
               Positioned(
                 bottom: 0,
@@ -191,9 +218,15 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                           borderRadius: BorderRadius.circular(21),
                         ),
                         child: Center(
-                          child: FaIcon(
-                            FontAwesomeIcons.paperPlane,
-                            color: isDark ? Colors.grey.shade500 : Colors.white,
+                          child: GestureDetector(
+                            onTap: isLoading ? null : _onSendPressed,
+                            child: FaIcon(
+                              isLoading
+                                  ? FontAwesomeIcons.hourglass
+                                  : FontAwesomeIcons.paperPlane,
+                              color:
+                                  isDark ? Colors.grey.shade500 : Colors.white,
+                            ),
                           ),
                         ),
                       ),
