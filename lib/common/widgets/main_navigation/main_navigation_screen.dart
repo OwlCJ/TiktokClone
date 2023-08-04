@@ -9,7 +9,6 @@ import 'package:tiktok_clone/common/widgets/main_navigation/widgets/post_video_b
 import 'package:tiktok_clone/features/inbox/views/inbox_screen.dart';
 import 'package:tiktok_clone/features/users/views/user_profile_screen.dart';
 import 'package:tiktok_clone/features/videos/views/video_recording_screen.dart';
-import 'package:tiktok_clone/features/videos/views/video_timeline_screen.dart';
 import 'package:tiktok_clone/utils.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -62,10 +61,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       backgroundColor:
           _selectedIndex == 0 || isDark ? Colors.black : Colors.white,
       body: Stack(children: [
-        Offstage(
-          offstage: _selectedIndex != 0,
-          child: const VideoTimelineScreen(),
-        ),
+        // Offstage(
+        //   offstage: _selectedIndex != 0,
+        //   child: const VideoTimelineScreen(),
+        // ),
         Offstage(
           offstage: _selectedIndex != 1,
           child: const DiscoverScreen(),
