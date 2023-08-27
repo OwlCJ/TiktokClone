@@ -1,16 +1,28 @@
-# tiktok_clone
+# Tiktok Clone Project
 
-A new Flutter project.
+### 📘 개요
 
-## Getting Started
+상용 서비스 틱톡을 클로닝한 프로젝트로 FireBase 연동 제작
 
-This project is a starting point for a Flutter application.
+### 🏃🏻‍♂️ 프로젝트 기한
 
-A few resources to get you started if this is your first Flutter project:
+2023.06 ~ 2023.07
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 🧑🏻‍💻 참여 팀원
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+혼자 진행
+
+### 🛠️ 기술 스택
+
+- Flutter
+- riverpod
+- FireBase
+- mvvm + repo
+
+### 🙋🏻 주요 기능 & 담당 역할
+
+- mvvm + repo 디자인패턴을 활용한 설계
+- riverpod을 활용한 상태관리
+- Firebase 를 통한 회원가입, 로그인 / 영상저장 / APNS 연동
+- Github 소셜 로그인 연동
+
